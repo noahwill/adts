@@ -48,6 +48,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
      */
     private Association<K,V>[] internal;
     private int size = 0;
+    public int getSize() { return size; }
     
 
     /**

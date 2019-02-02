@@ -22,6 +22,7 @@ public class MapSet<E> implements Set<E> {
      * map implementation. 
      */
     private Map<E, String> internal;
+    private int size = 0;
     
     public MapSet() {
         this.internal = new ArrayMap<E,String>();
@@ -32,7 +33,7 @@ public class MapSet<E> implements Set<E> {
      * unsupported, nor is concurrent modification checked).
      */
     public Iterator<E> iterator() {
-         throw new UnsupportedOperationException();
+         return internal.iterator();
     }
 
     /**
@@ -41,7 +42,8 @@ public class MapSet<E> implements Set<E> {
      * @param item The item to add
      */
     public void add(E item) {
-         throw new UnsupportedOperationException();
+    	 if (!this.contains(item)) size++;
+         internal.put(item, null);
     }
 
     /**
@@ -50,7 +52,7 @@ public class MapSet<E> implements Set<E> {
      * @return True if the item is in the set, false otherwise
      */
     public boolean contains(E item) {
-         throw new UnsupportedOperationException();
+         return internal.containsKey(item);
     }
 
     /**
@@ -59,7 +61,8 @@ public class MapSet<E> implements Set<E> {
      * @param item The item to remove
      */
    public void remove(E item) {
-        throw new UnsupportedOperationException();
+	   if (this.contains(item)) size--;
+       internal.remove(item);
     }
 
    /**
@@ -67,7 +70,7 @@ public class MapSet<E> implements Set<E> {
     * @return The number of items.
     */
     public int size() {
-         throw new UnsupportedOperationException();
+        return size;
     }
 
     /**
@@ -75,7 +78,10 @@ public class MapSet<E> implements Set<E> {
      * @return True if the set is empty, false otherwise.
      */
     public boolean isEmpty() {
-         throw new UnsupportedOperationException();
+         if (size == 0) {
+        	 return true;
+         }
+         else return false;
     }
     
     @Override
