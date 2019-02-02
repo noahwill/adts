@@ -9,7 +9,8 @@ public abstract class CollectionTest {
     protected Random rand = new Random(42);
     
     protected String[] states = { 
-             "Minnesota", "Minneapolis",
+    		 
+    		 "Minnesota", "Minneapolis",
              "Texas", "Dallas",
              "Oregon", "Seattle",
              "New Jersey", "Newark",

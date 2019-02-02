@@ -47,7 +47,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
      * representation of this map.
      */
     private Association<K,V>[] internal;
-
+    private int size = 0;
     
 
     /**
@@ -76,7 +76,21 @@ public class ArrayMap<K, V> implements Map<K, V> {
      * unsupported, nor is concurrent modification checked).
      */
     public Iterator<K> iterator() {
-    	return this.iterator();
+    	return new Iterator<K>() {
+    		private int pos = 0;
+    		private K toReturn;
+    		
+    		public boolean hasNext() { return size>pos; }
+    		
+    		public K next() {
+    			if (this.hasNext()) {
+    				toReturn = internal[pos].key;
+    				pos++;
+    				return toReturn; 
+    			}
+    			else 
+    				throw new NoSuchElementException();}
+    	};
     }
    
     
@@ -87,13 +101,25 @@ public class ArrayMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-      Association<K, V> toPut = new Association(key, val);
-      if (internal.length == 0) {
-    	  internal[0] = toPut;
-      }
+     Association<K, V> toPut = new Association(key, val);
+     boolean b = this.containsKey(key);
+    
+     if (size+1 >= internal.length) grow();
       
-      else if (this.containsKey(key)) {
+     if (b) {
+    	 int i = indexOf(key);
+    	 internal[i].val = val;
       }
+   
+     if (!b) {
+    	 for(int i = 0; i < internal.length; i++) {
+    		 if (internal[i] == null) {
+    			internal[i] = toPut;
+	   		 	size++;
+	   		 	break;
+       	  	}  
+    	 }
+     }
       
     }
 
@@ -103,7 +129,12 @@ public class ArrayMap<K, V> implements Map<K, V> {
      * @return The value associated with this key, null if none exists
      */
     public V get(K key) {
-        throw new UnsupportedOperationException();
+        
+    	for (int i = 0; i < size; i++) {
+        	if (internal[i].key.equals(key)) return internal[i].val;
+        }
+        
+        return null;
     }
 
     /**
@@ -113,19 +144,39 @@ public class ArrayMap<K, V> implements Map<K, V> {
      */
     public boolean containsKey(K key) {
         
-    	for (int i = 0; i <= internal.length; i++) {
-        	if (internal[i].key == key) return true;
+    	for (int i = 0; i < size; i++) {
+         	if (internal[i].key.equals(key)) return true;
         }
         
         return false;
     }
-
+    
+    public Integer indexOf(K key) {
+    	
+    	for (int i = 0; i < size; i++) {
+    		if (internal[i].key.equals(key)) return i; 
+    	}
+    	
+    	return null;
+    }
     /**
      * Remove the association for this key, if it exists.
      * @param key The key to remove
      */
     public void remove(K key) {
-        throw new UnsupportedOperationException();
+    	// Copy everything except the removed 
+    	@SuppressWarnings("unchecked")
+		Association<K,V>[] temp = (Association<K,V>[]) new Association[internal.length];
+    	if (this.containsKey(key)) {
+    		int index = indexOf(key);
+    		for( int i = 0; i <= size; i++) {
+    			if (i == index) {}
+    			else if (i < index){ temp[i] = internal[i]; }
+    			else { temp[i-1] = internal[i]; }
+    		}
+    	internal = temp;
+    	size--;
+        }
     }
     
     @Override
