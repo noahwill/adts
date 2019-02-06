@@ -26,15 +26,18 @@ public class ListBag<E> implements Bag<E> {
      */
     private List<E> internal;
     
+    int size;
+    
     public ListBag() {
             internal = new MapList<E>();
     }
+    
     /**
      * Return an iterator over this collection (remove() is
      * unsupported, nor is concurrent modification checked).
      */
    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException();
+        return internal.iterator();
     }
 
     /**
@@ -43,7 +46,8 @@ public class ListBag<E> implements Bag<E> {
      * @param item The item to add
      */
     public void add(E item) {
-         throw new UnsupportedOperationException();
+         internal.add(item);
+         size++;
     }
 
     /**
@@ -52,7 +56,13 @@ public class ListBag<E> implements Bag<E> {
      * @return The number of occurences of this item in the bag
      */
     public int count(E item) {
-         throw new UnsupportedOperationException();
+         Iterator<E> items = this.iterator();
+         int count = 0;
+         while (items.hasNext()) {
+        	 if (items.next().equals(item)) count++;
+         }
+         
+         return count;
     }
 
     /**
@@ -61,7 +71,16 @@ public class ListBag<E> implements Bag<E> {
      * @param item The item to remove
      */
     public void remove(E item) {
-         throw new UnsupportedOperationException();
+    	int i = 0;
+    	while (this.count(item) > 0) {
+    		if (internal.get(i).equals(item)) {
+    			internal.remove(i);
+    			size--;
+    		}
+    		else {
+    			i++;
+    		}
+    	}
     }
 
     /**
@@ -70,7 +89,7 @@ public class ListBag<E> implements Bag<E> {
      * @return The number of items.
      */
     public int size() {
-         throw new UnsupportedOperationException();
+         return size;
     }
 
     /**
@@ -78,7 +97,8 @@ public class ListBag<E> implements Bag<E> {
      * @return True if the bag is empty, false otherwise.
      */
     public boolean isEmpty() {
-         throw new UnsupportedOperationException();
+         if (size == 0) { return true; }
+         else return false;
     }
     
     @Override

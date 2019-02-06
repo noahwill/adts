@@ -1,6 +1,8 @@
 package impl;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import adt.Map;
 import adt.List;
 
@@ -22,6 +24,8 @@ public class MapList<E> implements List<E> {
      */
     private Map<Integer, E> internal;
     
+    private int size;
+    
     
     /**
      * Constructor that is given the internal representation.
@@ -41,7 +45,21 @@ public class MapList<E> implements List<E> {
      * unsupported, nor is concurrent modification checked).
      */
     public Iterator<E> iterator() {
-         throw new UnsupportedOperationException();
+    	return new Iterator<E>() {
+    		private int pos = 0;
+    		private E toReturn;
+    		
+    		public boolean hasNext() { return size>pos; }
+    		
+    		public E next() {
+    			if (this.hasNext()) {
+    				toReturn = internal.get(pos);
+    				pos++;
+    				return toReturn; 
+    			}
+    			else 
+    				throw new NoSuchElementException();}
+    	};
     }
 
     /**
@@ -50,7 +68,8 @@ public class MapList<E> implements List<E> {
      * @param element The element to be appended
      */
     public void add(E element) {
-         throw new UnsupportedOperationException();
+         internal.put(size, element);
+         size++;
     }
 
     /**
@@ -61,7 +80,8 @@ public class MapList<E> implements List<E> {
      * @param element The element at the specified position
      */
     public void set(int index, E element) {
-         throw new UnsupportedOperationException();
+         if (index > size - 1 || index < 0) throw new IndexOutOfBoundsException();
+         internal.put(index, element);
     }
 
     /**
@@ -71,7 +91,8 @@ public class MapList<E> implements List<E> {
      * @return The element at the specified position
      */
     public E get(int index) {
-         throw new UnsupportedOperationException();
+    	if (index > size - 1 || index < 0) throw new IndexOutOfBoundsException();
+    	else return internal.get(index);
     }
 
 
@@ -86,7 +107,26 @@ public class MapList<E> implements List<E> {
      * @param element The element which to insert
      */
     public void insert(int index, E element) {
-         throw new UnsupportedOperationException();
+    	if (index == size) { this.add(element); }
+    	else if (index > size - 1 || index < 0) throw new IndexOutOfBoundsException();
+    	else {
+    		E temp = this.get(index);
+    		E temp2;
+    		for (int i = 0; i < size; i++) {
+    			if (i == index) { this.set(index, element); size++;}
+    			
+    			else {
+    				if (i+1 >= size) { this.set(i, temp); }
+    				if (i < index) {}
+    				else {
+    					temp2 = this.get(i);
+        				this.set(i, temp);
+        				temp = temp2;
+        				temp2 = null;
+    				}	
+    			}
+    		}
+    	}	
     }
 
     /**
@@ -98,7 +138,27 @@ public class MapList<E> implements List<E> {
      * @return The item removed
      */
    public E remove(int index) {
-        throw new UnsupportedOperationException();
+	   if (index > size - 1 || index < 0) throw new IndexOutOfBoundsException();
+	   E toReturn;
+	   if (index == size) { 
+		   toReturn = this.get(index);
+		   size--;
+	   }
+	   
+	   else {
+	       toReturn = this.get(index);
+	       for( int i = 0; i < size; i++) {
+	    	   
+	    	   if (i < index){ this.set(i, this.get(i)); }
+	    	   else if (i + 1 > size - 1) {}
+	    	   
+	    	   else {
+	    		   this.set(i, this.get(i+1));
+	    	   }
+	       }
+	       size--;
+	   }
+	   return toReturn;
    }
 
    /**
@@ -106,7 +166,7 @@ public class MapList<E> implements List<E> {
     * @return The number of elements in this list.
     */
     public int size() {
-         throw new UnsupportedOperationException();
+         return size;
     }
     
     @Override
@@ -121,8 +181,5 @@ public class MapList<E> implements List<E> {
     	}
     	return toReturn +"]";
     }
-    
-    	
-
-
+   
 }

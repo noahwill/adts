@@ -102,7 +102,8 @@ public class ArrayMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-     Association<K, V> toPut = new Association(key, val);
+    @SuppressWarnings("unchecked")
+	Association<K, V> toPut = new Association(key, val);
      boolean b = this.containsKey(key);
     
      if (size+1 >= internal.length) grow();
