@@ -42,10 +42,7 @@ public class Sorts {
         // C. Determine the initial next place for each value
         nextPlace[0] = 0;
         //add loop here
-        for(int i = 1; i < nextPlace.length - 1; i++) { 
-        	System.out.println(i-1);
-        	nextPlace[i] = nextPlace[i-1] + counts[i-1]; 
-        }
+        for(int i = 1; i < nextPlace.length; i++) { nextPlace[i] = nextPlace[i-1] + counts[i-1]; }
 
         // The auxiliary array into which to sort the array
         @SuppressWarnings("unchecked")
@@ -88,7 +85,8 @@ public class Sorts {
             final int rp = rPow;
             countingSort(array, new ToInteger<Integer>() {
                 public int v(Integer item) {
-                     throw new UnsupportedOperationException();
+                     int ret = (int) ((item/rp)%r);
+                     return ret;
                 }
             });
             rPow *= r;
