@@ -221,7 +221,34 @@ public class Heap<E> {
      * POSTCONDITION: The subtree rooted at i is a heap.
      */
     public void decreaseKeyAt(int i) {
-         throw new UnsupportedOperationException();
+    	assert 0 <= i && i < heapSize;
+    	
+    	// i has two children, both of greater priority
+    	if (left(i) < heapSize && right(i) < heapSize && compy.compare(internal[left(i)], internal[i]) > 0 && compy.compare(internal[right(i)], internal[i]) > 0) {
+    		// left has a greater priority than right
+    		if (compy.compare(internal[left(i)], internal[right(i)]) > 0) {
+    			swap(left(i), i);
+        		decreaseKeyAt(left(i));
+    		}
+    		
+    		// right has a greater priority than left
+    		else {
+    			swap(right(i), i);
+        		decreaseKeyAt(right(i));
+    		}
+    	}
+    	
+    	// i only has one child to the left and it is of greater priority
+    	else if(left(i) < heapSize && compy.compare(internal[left(i)], internal[i]) > 0) {
+    		swap(left(i), i);
+    		decreaseKeyAt(left(i));
+    	}
+    	
+    	// i only has one child to the right and it is of greater priority
+    	else if(right(i) < heapSize && compy.compare(internal[right(i)], internal[i]) > 0) {
+    		swap(right(i), i);
+    		decreaseKeyAt(right(i));
+    	}
      }
     
     /** 
@@ -235,8 +262,13 @@ public class Heap<E> {
      * 
      */
     public void increaseKeyAt(int i) {
-        
-         throw new UnsupportedOperationException();
+    	assert 0 <= i && i < heapSize;
+    	
+    	if(parent(i) >= 0 && compy.compare(internal[parent(i)], internal[i]) < 0) {
+    		swap(parent(i), i);
+    		increaseKeyAt(parent(i));
+    	}
+    
     }
     
     /**
