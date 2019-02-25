@@ -93,7 +93,7 @@ public abstract class PriorityQueueTest extends CollectionTest {
     @Test
     public void testIInsertFew() {
         resetMeasEqEmpty(array.length);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++) 
             mpq.insert(array[i]);
         assertEquals(99, mpq.extractMax().kernel.intValue());
     }
@@ -145,13 +145,6 @@ public abstract class PriorityQueueTest extends CollectionTest {
         assertEquals(11, mpq.extractMax().kernel.intValue());  
     }
 
-    @Test
-    public void testWFull() {
-        wpRestore();
-        resetWidgetPopulated();
-        assertFalse(wpq.isEmpty());
-        assertTrue(wpq.isFull());
-    }
     
     @Test
     public void testWMed() {
@@ -161,7 +154,6 @@ public abstract class PriorityQueueTest extends CollectionTest {
         wpq.extractMax();
         wpq.extractMax();
         assertFalse(wpq.isEmpty());
-        assertFalse(wpq.isFull());
     }
     
     @Test
@@ -179,7 +171,6 @@ public abstract class PriorityQueueTest extends CollectionTest {
         wpq.extractMax();
         wpq.extractMax();
         assertTrue(wpq.isEmpty());
-        assertFalse(wpq.isFull());
     }
 
     @Test

@@ -29,6 +29,7 @@ public class HeapTest extends CollectionTest{
         }
     };
     
+    
     private class HeapObj{
         
         private Integer kernel;
@@ -50,53 +51,22 @@ public class HeapTest extends CollectionTest{
         }
     }
 
-    protected void siftupInteger(final Integer[] array, final int i, final int size) {
-        new Heap<Integer>() {
-            void testSiftup() {
-                internal = array;
-                heapSize = size;
-                compy = comps;
-                sinkKeyAt(i);
-            }
-        }.testSiftup();
+    protected void decreaseKeyAtInteger(final Integer[] array, final int i, final int size) {
+        Heap.array2Heap(array, size, comps).decreaseKeyAt(i);
     }
     
-    protected void siftdownInteger(final Integer[] array, final int i, final int size) {
-        new Heap<Integer>() {
-            void testSiftdown() {
-                internal = array;
-                heapSize = size;
-                compy = comps;
-                assert(i >= 0);
-                raiseKeyAt(i);
-            }
-        }.testSiftdown();
+    protected void increaseKeyAtInteger(final Integer[] array, final int i, final int size) {
+        Heap.array2Heap(array, size, comps).increaseKeyAt(i);
     }
     
-    protected void siftupHeapObj(final HeapObj[] array, final int i, final int size) {
-        new Heap<HeapObj>() {
-            void testSiftup() {
-                internal = array;
-                heapSize = size;
-                compy = hcomps;
-                assert(i >= 0);
-                sinkKeyAt(i);
-            }
-        }.testSiftup();
+    protected void decreaseKeyAtHeapObj(final HeapObj[] array, final int i, final int size) {
+        Heap.array2Heap(array, size, hcomps).decreaseKeyAt(i);
     }
     
 
     
-    protected void siftdownHeapObj(final HeapObj[] array, final int i, final int size) {
-        new Heap<HeapObj>() {
-            void testSiftdown() {
-                internal = array;
-                heapSize = size;
-                compy = hcomps;
-                assert(i >= 0);
-                raiseKeyAt(i);
-            }
-        }.testSiftdown();
+    protected void increaseKeyAtHeapObj(final HeapObj[] array, final int i, final int size) {
+        Heap.array2Heap(array, size, hcomps).increaseKeyAt(i);
     }
     
     protected <T> void validateHeap(T[] heap,Comparator<T> comp) {
@@ -115,9 +85,9 @@ public class HeapTest extends CollectionTest{
     }
     
     @Test
-    public void siftupTrivial() {
+    public void decreaseKeyAtTrivial() {
         Integer[] array = { 5 };
-        siftupInteger(array, 0, 1);
+        decreaseKeyAtInteger(array, 0, 1);
         assertEquals(array[0].intValue(), 5);
         validateHeap(array,comps);
     }
@@ -125,9 +95,9 @@ public class HeapTest extends CollectionTest{
     
     
     @Test
-    public void siftupSmallAlreadyHeap() {
+    public void decreaseKeyAtSmallAlreadyHeap() {
         Integer[] array = {13, 12, 5};
-        siftupInteger(array, 0, 3);
+        decreaseKeyAtInteger(array, 0, 3);
         assertEquals(array[0].intValue(), 13);
         assertEquals(array[1].intValue(), 12);
         assertEquals(array[2].intValue(), 5);
@@ -136,9 +106,9 @@ public class HeapTest extends CollectionTest{
    
     
     @Test
-    public void siftupSmallHeapBothViolate() {
+    public void decreaseKeyAtSmallHeapBothViolate() {
         Integer[] array = {5, 12, 13};
-        siftupInteger(array, 0, 3);
+        decreaseKeyAtInteger(array, 0, 3);
         assertEquals(array[0].intValue(), 13);
         assertEquals(array[1].intValue(), 12);
         assertEquals(array[2].intValue(), 5);
@@ -146,9 +116,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupSmallHeapLeftViolates() {
+    public void decreaseKeyAtSmallHeapLeftViolates() {
         Integer[] array = {5, 12, 3};
-        siftupInteger(array, 0, 3);
+        decreaseKeyAtInteger(array, 0, 3);
         assertEquals(array[0].intValue(), 12);
         assertEquals(array[1].intValue(), 5);
         assertEquals(array[2].intValue(), 3);
@@ -156,9 +126,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupSmallHeapRightViolates() {
+    public void decreaseKeyAtSmallHeapRightViolates() {
         Integer[] array = {5, 2, 13};
-        siftupInteger(array, 0, 3);
+        decreaseKeyAtInteger(array, 0, 3);
         assertEquals(array[0].intValue(), 13);
         assertEquals(array[1].intValue(), 2);
         assertEquals(array[2].intValue(), 5);
@@ -166,9 +136,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupMedRightViolatesThenLeft() {
+    public void decreaseKeyAtMedRightViolatesThenLeft() {
         Integer[] array = {4, 3, 6, 2, 1, 5};
-        siftupInteger(array, 0, 6);
+        decreaseKeyAtInteger(array, 0, 6);
         assertEquals(array[0].intValue(), 6);
         assertEquals(array[1].intValue(), 3);
         assertEquals(array[2].intValue(), 5);
@@ -180,9 +150,9 @@ public class HeapTest extends CollectionTest{
     }
     
     @Test
-    public void siftupLargeFullAlreadyHeap() {
+    public void decreaseKeyAtLargeFullAlreadyHeap() {
         Integer[] array = { 8, 4, 7, 3, 1, 6, 2};
-        siftupInteger(array, 0, 7);
+        decreaseKeyAtInteger(array, 0, 7);
         assertEquals(array[0].intValue(), 8);
         assertEquals(array[1].intValue(), 4);
         assertEquals(array[2].intValue(), 7);
@@ -194,9 +164,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupLargeNonFullAlreadyHeap() {
+    public void decreaseKeyAtLargeNonFullAlreadyHeap() {
         Integer[] array = { 8, 4, 7, 3, 1, 6, 2, 2};
-        siftupInteger(array, 0, 7);
+        decreaseKeyAtInteger(array, 0, 7);
         assertEquals(array[0].intValue(), 8);
         assertEquals(array[1].intValue(), 4);
         assertEquals(array[2].intValue(), 7);
@@ -209,9 +179,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupGivenExample() {
+    public void decreaseKeyAtGivenExample() {
         Integer[] array = {10, 13, 17, 11, 7, 3, 15, 1, 9, 5 };
-        siftupInteger(array, 0, 10);
+        decreaseKeyAtInteger(array, 0, 10);
         assertEquals(array[0].intValue(), 17);
         assertEquals(array[1].intValue(), 13);
         assertEquals(array[2].intValue(), 15);
@@ -226,9 +196,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupIgnoreNoiseBelow() {
+    public void decreaseKeyAtIgnoreNoiseBelow() {
         Integer[] array = {10, 13, 17, 11, 7, 3, 15, 1, 9, 5, 71, 82, 3, 99, 1 };
-        siftupInteger(array, 0, 10);
+        decreaseKeyAtInteger(array, 0, 10);
         assertEquals(array[0].intValue(), 17);
         assertEquals(array[1].intValue(), 13);
         assertEquals(array[2].intValue(), 15);
@@ -248,9 +218,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupNoiseWithin() {
+    public void decreaseKeyAtNoiseWithin() {
         Integer[] array = { 2, 10, 99, 17, 13, 27, 81, 3, 15, 11 };
-        siftupInteger(array, 1, 10);
+        decreaseKeyAtInteger(array, 1, 10);
         assertEquals(array[0].intValue(), 2);
         assertEquals(array[1].intValue(), 17);
         assertEquals(array[2].intValue(), 99);
@@ -266,9 +236,9 @@ public class HeapTest extends CollectionTest{
     }
 
     @Test
-    public void siftupWithDuplicates() {
+    public void decreaseKeyAtWithDuplicates() {
         Integer[] array = { 13, 3, 7, 11, 11, 6, 4, 2 };
-        siftupInteger(array, 1, 8);
+        decreaseKeyAtInteger(array, 1, 8);
         assertEquals(array[0].intValue(), 13);
         assertEquals(array[1].intValue(), 11);
         assertEquals(array[2].intValue(), 7);
@@ -280,10 +250,10 @@ public class HeapTest extends CollectionTest{
         validateHeap(array,comps);
     }
     @Test
-    public void siftupWithDuplicatesHeapObj() {
+    public void decreaseKeyAtWithDuplicatesHeapObj() {
         HeapObj[] array = { new HeapObj(13), new HeapObj(3),new HeapObj(7) , 
                 new HeapObj(11), new HeapObj(11), new HeapObj(6), new HeapObj(4),new HeapObj(2)};
-        siftupHeapObj(array, 1, 8);
+        decreaseKeyAtHeapObj(array, 1, 8);
         assertEquals(array[0].kernel.intValue(), 13);
         assertEquals(array[1].kernel.intValue(), 11);
         assertEquals(array[2].kernel.intValue(), 7);
@@ -296,7 +266,7 @@ public class HeapTest extends CollectionTest{
     }
     
     @Test
-    public void siftupStressTestRoot() {
+    public void decreaseKeyAtStressTestRoot() {
         int tests=1000;
         int maxsize=10;
         for (int i = 0; i < tests; i++) {
@@ -309,7 +279,7 @@ public class HeapTest extends CollectionTest{
             array[1] = new HeapObj(rand.nextInt(Integer.MAX_VALUE));
             for (int j = 2; j < size; j++)
                 array[j] = new HeapObj(rand.nextInt(array[j-1].kernel+1));
-            siftupHeapObj(array,start,stop);
+            decreaseKeyAtHeapObj(array,start,stop);
             /* Figure out the maximum number of comparisons allowed  for a heap of size size
              *  maxComparisons= C(size) where
              *  C(1) = 0
@@ -331,44 +301,44 @@ public class HeapTest extends CollectionTest{
     }
     
     @Test
-    public void trivialSiftdown() {
+    public void trivialincreaseKeyAt() {
         Integer[] array = { 5 };
-        siftdownInteger(array,0,array.length);
+        increaseKeyAtInteger(array,0,array.length);
         assertEquals(5,array[0].intValue());
         validateHeap( array,0,array.length,comps);
     }
     
     @Test
-    public void dontSiftdown() {
+    public void dontincreaseKeyAt() {
         Integer[] array = { 5, 4 };
-        siftdownInteger(array,1,array.length);
+        increaseKeyAtInteger(array,1,array.length);
         assertEquals(5,array[0].intValue());
         assertEquals(4,array[1].intValue());
         validateHeap( array,0,array.length,comps);
     }
     
     @Test
-    public void doSiftdown() {
+    public void doincreaseKeyAt() {
         Integer[] array = { 4, 5 };
-        siftdownInteger(array,1,array.length);
+        increaseKeyAtInteger(array,1,array.length);
         assertEquals(5,array[0].intValue());
         assertEquals(4,array[1].intValue());
         validateHeap( array,0,array.length,comps);
     }
     
     @Test
-    public void doSiftdownIgnoreNoise() {
+    public void doincreaseKeyAtIgnoreNoise() {
         Integer[] array = { 4, 5 ,5,9,42};
-        siftdownInteger(array,1,2);
+        increaseKeyAtInteger(array,1,2);
         assertEquals(5,array[0].intValue());
         assertEquals(4,array[1].intValue());
         validateHeap( array,0,2,comps);
     }
     
     @Test
-    public void siftdownMultiLevel() {
+    public void increaseKeyAtMultiLevel() {
         Integer[] array = { 10, 9 ,8,7,42};
-        siftdownInteger(array,4,array.length);
+        increaseKeyAtInteger(array,4,array.length);
         assertEquals(42,array[0].intValue());
         assertEquals(10,array[1].intValue());
         assertEquals(8,array[2].intValue());
@@ -378,9 +348,9 @@ public class HeapTest extends CollectionTest{
     }
     
     @Test
-    public void siftdownDuplicates() {
+    public void increaseKeyAtDuplicates() {
         Integer[] array = { 9, 9 ,8,7,9};
-        siftdownInteger(array,4,array.length);
+        increaseKeyAtInteger(array,4,array.length);
         assertEquals(9,array[0].intValue());
         assertEquals(9,array[1].intValue());
         assertEquals(8,array[2].intValue());
@@ -389,10 +359,10 @@ public class HeapTest extends CollectionTest{
         validateHeap( array,0,array.length,comps);
     }
     @Test
-    public void siftdownDuplicatesComparison() {
+    public void increaseKeyAtDuplicatesComparison() {
         comparisons = 0;
         HeapObj[] array = { new HeapObj(9), new HeapObj(9) ,new HeapObj(8),new HeapObj(7),new HeapObj(9)};
-        siftdownHeapObj(array,4,array.length);
+        increaseKeyAtHeapObj(array,4,array.length);
         assertEquals(9,array[0].kernel.intValue());
         assertEquals(9,array[1].kernel.intValue());
         assertEquals(8,array[2].kernel.intValue());
@@ -406,7 +376,7 @@ public class HeapTest extends CollectionTest{
     /* I took this one out for SP 18. It seems it doesn't always
       increase the key. --TVD
     @Test
-    public void siftdownStressComparisons() {
+    public void increaseKeyAtStressComparisons() {
         
         int size = 10000;
         int passes = 100;
@@ -422,7 +392,7 @@ public class HeapTest extends CollectionTest{
             // sometimes make the changed entry the largest thing in the array, sometimes make it land in the middle
             int newVal = i%3==0 ? ++mid : ++biggest;
             array[i].kernel = new Integer(newVal);
-            siftdownHeapObj(array,i,array.length);
+            increaseKeyAtHeapObj(array,i,array.length);
             // comparisons should be less than or equal to floor(lg(i+1)) (the level of the node in the tree) 
             //assert(comparisons <= 31-Integer.numberOfLeadingZeros(i+1));
             validateHeap(array,0,array.length,hcomps);

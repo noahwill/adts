@@ -27,12 +27,6 @@ public interface PriorityQueue<E> {
     boolean isEmpty();
     
     /**
-     * Is this pq full?
-     * @return True if this is full, false otherwise.
-     */
-    boolean isFull();
-
-    /**
      * Insert a new key into this pq.
      * @param key The key to insert.  
      */
