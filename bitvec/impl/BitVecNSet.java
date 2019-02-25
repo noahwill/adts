@@ -212,16 +212,22 @@ public class BitVecNSet implements NSet {
     	// calculate the index of the first true position,
         // if any; that is, the first value the iterator should
         // return
-        int j = 0;
-        while (j < internal.length && internal[j] != 1) j++;
-        final int finalJ = j;
+        int first = 0;
+        for (int j = 0; j < internal.length - 1; j++)
+            for (int k = 0; k < 8; k++)
+                if ((internal[j] & (1 << k)) == 1) {
+                	first = k;
+                	break;
+                }
+        final int finalFirst = first;
         
         // calculate the number of true values in the array
         int ons = size();
         final int finalOns = ons;
-         return new Iterator<Integer>() {
+        
+        return new Iterator<Integer>() {
         	 
-        	int i = finalJ;
+        	int i = finalFirst;
         	int ons = finalOns;
 			@Override
 			public boolean hasNext() {
@@ -234,8 +240,12 @@ public class BitVecNSet implements NSet {
 				if (!hasNext()) throw new NoSuchElementException();
 				int returner = i;
 				for (int j = 0; j < internal.length - 1; j++)
-		            for (int k = 0; k < 8; k++)
-		                if ((internal[j] & (1 << k)) == 1);
+		            for (int k = i; k < 8; k++)
+		                if ((internal[j] & (1 << k)) == 1) {
+							i = k;
+							break;
+		                }
+				
 		                
 				ons--;
 				return returner;
@@ -248,11 +258,11 @@ public class BitVecNSet implements NSet {
         String toReturn = "[";
         for (int i = 0; i < internal.length - 1; i++)
             for (int j = 0; j < 8; j++)
-                if ((internal[i] & (1 << j)) == 0)  toReturn += j +": 0, ";
-                else toReturn += j + ": 1, ";
+                if ((internal[i] & (1 << j)) == 0)  toReturn += "0";
+                else toReturn += "1";
         for (int j = 0; j < range % 8; j++)
-            if ((internal[internal.length - 1] & (1 << j)) == 0)  toReturn += j +": 0, ";
-            else toReturn += j +": 1, ";
+            if ((internal[internal.length - 1] & (1 << j)) == 0)  toReturn += "0";
+            else toReturn += "1";
         for (int j = range % 8; j < 8; j++)
             toReturn += "x";
         toReturn += "]";

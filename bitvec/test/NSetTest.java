@@ -534,12 +534,20 @@ public abstract class NSetTest {
         reset();
         for (int i = 0; i < 6; i++)
             testSet.add(data[i]);
+        System.out.println("Test Set  : " + testSet.toString());
         for (int i = 4; i < 13; i++)
             other.add(data[i]);
+        System.out.println("Other Set : " + other.toString());
         NSet result = testSet.intersection(other);
+        System.out.println("Result Set: " + result.toString());
+        
         clearMarks();
         for (Iterator<Integer> it = testSet.iterator(); it.hasNext(); ) 
             marks[indexForDatum(it.next())]++;
+        System.out.println("Mark Set: ");
+        for (int i = 0; i < marks.length; i++) {
+        	System.out.print(marks[i] + " ");
+        }
         for (int i = 0; i < 6; i++)
             assertEquals(1, marks[i]);
         for (int i = 6; i < marks.length; i++)
