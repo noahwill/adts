@@ -67,7 +67,7 @@ public class Heap<E> {
     protected Heap(E[] items, Comparator<E> compy) {
         initializeInternal(items.length, compy);
         for (int i = 0; i < items.length; i++)
-            internal[i] = items[i];
+        	set(i, items[i]);
         buildHeap();
     }
 
