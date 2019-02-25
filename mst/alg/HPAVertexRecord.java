@@ -57,4 +57,16 @@ class HPAVertexRecord implements HeapPositionAware {
         this.distance = distance;
     }
     
-    public double getDistance() { return distance; }}
+    public double getDistance() { return distance; }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (! (other instanceof HPAVertexRecord)) return false;
+        else return id == ((HPAVertexRecord) other).id;
+    }
+    
+    public String toString() {
+        return "[VR (" + id + ") " + distance + " " + pos + "]";
+    }
+
+}
