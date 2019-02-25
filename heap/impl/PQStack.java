@@ -37,7 +37,19 @@ public class PQStack<E> implements Stack<E> {
      */
     public PQStack(int maxSize) {
         arrivalTimes = new ListMap<E, Integer>();
-        //finish constructor here
+        Comparator<E> compy = new Comparator<E>() {
+
+			public int compare(E o1, E o2) {
+				if (arrivalTimes.get(o1) < arrivalTimes.get(o2))
+					return 1;
+				else if (arrivalTimes.get(o1) > arrivalTimes.get(o2))
+					return -1;
+				return 0;
+			}
+        	
+        };
+        
+        pq = new HeapPriorityQueue<E>(maxSize, compy);
     }
 
     /**
@@ -57,7 +69,8 @@ public class PQStack<E> implements Stack<E> {
      * @return The top element.
      */
     public E top() { 
-         throw new UnsupportedOperationException();
+    	if (isEmpty()) throw new NoSuchElementException();
+        return pq.max();
     }
 
     /**
@@ -65,7 +78,9 @@ public class PQStack<E> implements Stack<E> {
      * @return The top element.
      */
     public E pop() {
-         throw new UnsupportedOperationException();
+    	if (isEmpty()) throw new NoSuchElementException();
+    	arrivalTimes.remove(pq.max());
+        return pq.extractMax();
     }
 
     /**
@@ -73,7 +88,15 @@ public class PQStack<E> implements Stack<E> {
      * @param x The element to add.
      */
     public void push(E x) {
-         throw new UnsupportedOperationException();
+    	if (isFull()) throw new FullContainerException();
+    	Map<E, Integer> newTimes = new ListMap<E, Integer>();
+    	
+    	for (E key : arrivalTimes)
+    		newTimes.put(key, arrivalTimes.get(key) + 1);
+    	
+    	newTimes.put(x, 0);
+    	arrivalTimes = newTimes;
+        pq.insert(x);
     }
 
     public String toString() { return pq.toString(); }

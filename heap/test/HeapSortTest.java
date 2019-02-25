@@ -45,12 +45,11 @@ public class HeapSortTest extends HeapTest {
     
     @Test
     public void testNonTrivial() {
+    	
         int[] array = { 33, 22, 66, 99, 11, 88, 55, 77, 44 };
         HeapSorter.sort(array);
         assertTrue(isSorted(array));
     }
-    
-
     
     
 }

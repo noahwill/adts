@@ -210,7 +210,6 @@ public class Heap<E> {
         set(i, internal[j]);
         set(j, temp);
     }
-    
     /** 
      * Enforce the heap property on the subtree rooted at the given index.
      * To be used when initially building a heap and when fixing up
@@ -378,6 +377,7 @@ public class Heap<E> {
         return toReturn;
             
     }
+    
 
     
     

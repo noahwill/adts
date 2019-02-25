@@ -30,9 +30,14 @@ public class HeapSorter {
                 });
         
         // insert code for completing the heap sort algorithm
-
+        for (int i=heap.heapSize()-1; i>=0; i--) 
+        { 
+            heap.swap(i, 0);
+            heap.decrementHeapSize();
+            if(i != 0) heap.decreaseKeyAt(0); 
+        } 
         // postcondition: that heap.internal is sorted
-        
+       
         // copy elements from internal (now sorted) back to array
         for (int i = 0; i < array.length; i++)
             array[i] = heap.get(i);
@@ -55,13 +60,17 @@ public class HeapSorter {
                 });
         
         // insert code for completing the heap sort algorithm
-
+        for (int i=heap.heapSize()-1; i>=0; i--) 
+        { 
+            heap.swap(i, 0);
+            heap.decrementHeapSize();
+            if(i != 0) heap.decreaseKeyAt(0); 
+        } 
         // postcondition: that heap.internal is sorted
-        
+    
+        // copy elements )from internal (now sorted) back to array
+        for (int i = 0; i < array.length; i++)
+            array[i] = heap.get(i);
     }
 
-    
-    
-   
-    
 }

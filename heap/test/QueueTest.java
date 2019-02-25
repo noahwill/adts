@@ -209,18 +209,40 @@ public abstract class QueueTest extends CollectionTest {
 		reset();
 		try {
 			populate(6);
+			System.out.println("Before 1st Loop " + ": " + testQueue.toString());
+			System.out.println();
+			
 			for (int i = 0; i < 2; i++) {
 				assertFalse(testQueue.isEmpty());
+				System.out.println("Data 1st Loop " + i + ": " + getData()[i]);
+				System.out.println("1st Loop Front " + i + ": " + testQueue.front());
 				assertEquals(getData()[i], testQueue.front());
+				
 				assertEquals(getData()[i], testQueue.remove());
+				System.out.println("1st Loop Remove " + i + ": " + testQueue.toString());
+				System.out.println();
 			}
 			assertFalse(testQueue.isEmpty());
-			for (int i = 6; i < 10; i++)
+			System.out.println();
+			
+			for (int i = 6; i < 10; i++) {
 				testQueue.enqueue(getData()[i]);
+				System.out.println("Enqueue Loop " + i + ":    " + testQueue.toString());
+			}
+			
+			System.out.println();
+			System.out.println("Before 2nd Loop " + ":  " + testQueue.toString());
+			System.out.println();
+			
 			for (int i = 2; i < 10; i++) {
 				assertFalse(testQueue.isEmpty());
+				System.out.println("Data 2nd Loop " + i + ": " + getData()[i]);
+				System.out.println("2nd Loop Front " + i + ": " + testQueue.front());
 				assertEquals(getData()[i], testQueue.front());
+				
 				assertEquals(getData()[i], testQueue.remove());
+				System.out.println("2nd Loop Remove " + i + ": " + testQueue.toString());
+				System.out.println();
 			}
 			assertTrue(testQueue.isEmpty());
 			boolean caught = false;
