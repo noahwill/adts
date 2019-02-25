@@ -69,6 +69,7 @@ public class BitVecNSet implements NSet {
         checkIndex(item);
         internal[item / 8] |= 1 << (item % 8);
     }
+    
 
     /**
      * Does this set contain the item?
@@ -77,7 +78,9 @@ public class BitVecNSet implements NSet {
      */ 
     public boolean contains(Integer item) {
         checkIndex(item);
-         throw new UnsupportedOperationException();
+        if (((internal[item/8] >> (item%8)) & 1) == 1)
+    		return true;
+    	return false;
     }
 
     /**
@@ -87,7 +90,7 @@ public class BitVecNSet implements NSet {
      */ 
     public void remove(Integer item) {
         checkIndex(item);
-         throw new UnsupportedOperationException();
+        internal[item/8] &= ~(1 << (item%8));
     }
 
 
@@ -96,7 +99,10 @@ public class BitVecNSet implements NSet {
      * @return True if the set is empty, false otherwise.
      */
     public boolean isEmpty() {
-         throw new UnsupportedOperationException();
+    	for (int i = 0; i < 8; i++) {
+    		if (contains(i)) return false;
+    	}
+        return true;
     }
 
 
@@ -136,7 +142,13 @@ public class BitVecNSet implements NSet {
      */
     public NSet union(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BitVecNSet oth = (BitVecNSet) other;
+        BitVecNSet toReturn = new BitVecNSet(range);
+        
+        for (int i = 0; i < internal.length; i++) {
+        	toReturn.internal[i] = (byte) (internal[i] | oth.internal[i]);
+        }
+        return toReturn;
     }
 
     /**
@@ -148,7 +160,13 @@ public class BitVecNSet implements NSet {
      */
     public NSet intersection(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BitVecNSet oth = (BitVecNSet) other;
+        BitVecNSet toReturn = new BitVecNSet(range);
+        
+        for (int i = 0; i < internal.length; i++) {
+        	toReturn.internal[i] = (byte) (internal[i] & oth.internal[i]);
+        }
+        return toReturn;
     }
 
     /**
@@ -161,7 +179,13 @@ public class BitVecNSet implements NSet {
      */
     public NSet difference(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BitVecNSet oth = (BitVecNSet) other;
+        BitVecNSet toReturn = new BitVecNSet(range);
+        
+        for (int i = 0; i < internal.length; i++) {
+        	toReturn.internal[i] = (byte) (internal[i] ^ oth.internal[i]);
+        }
+        return toReturn;
     }
 
     /**
@@ -169,25 +193,66 @@ public class BitVecNSet implements NSet {
      * @return The number of items.
      */
     public int size() {
-         throw new UnsupportedOperationException();
+        int size = 0;
+    	for (int i = 0; i < internal.length - 1; i++)
+            for (int j = 0; j < 8; j++)
+                if ((internal[i] & (1 << j)) == 0);
+                else size++;
+        for (int j = 0; j < range % 8; j++)
+            if ((internal[internal.length - 1] & (1 << j)) == 0);
+            else size++;
+        return size;
     }
 
     /**
      * Iterate through this set.
      */
     public Iterator<Integer> iterator() {
-         throw new UnsupportedOperationException();
+    	
+    	// calculate the index of the first true position,
+        // if any; that is, the first value the iterator should
+        // return
+        int j = 0;
+        while (j < internal.length && internal[j] != 1) j++;
+        final int finalJ = j;
+        
+        // calculate the number of true values in the array
+        int ons = size();
+        final int finalOns = ons;
+         return new Iterator<Integer>() {
+        	 
+        	int i = finalJ;
+        	int ons = finalOns;
+			@Override
+			public boolean hasNext() {
+				if (ons > 0) return true;
+				return false;
+			}
+
+			@Override
+			public Integer next() {
+				if (!hasNext()) throw new NoSuchElementException();
+				int returner = i;
+				for (int j = 0; j < internal.length - 1; j++)
+		            for (int k = 0; k < 8; k++)
+		                if ((internal[j] & (1 << k)) == 1);
+		                
+				ons--;
+				return returner;
+			}
+        	 
+         };
     }
 
     public String toString() {
         String toReturn = "[";
         for (int i = 0; i < internal.length - 1; i++)
             for (int j = 0; j < 8; j++)
-                if ((internal[i] & (1 << j)) == 0)  toReturn += " ";
-                else toReturn += ".";
+                if ((internal[i] & (1 << j)) == 0)  toReturn += j +": 0, ";
+                else toReturn += j + ": 1, ";
         for (int j = 0; j < range % 8; j++)
-            if ((internal[internal.length - 1] & (1 << j)) == 0)  toReturn += " ";
-            else toReturn += ".";
+            if ((internal[internal.length - 1] & (1 << j)) == 0)  toReturn += j +": 0, ";
+            else toReturn += j +": 1, ";
         for (int j = range % 8; j < 8; j++)
             toReturn += "x";
         toReturn += "]";

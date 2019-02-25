@@ -87,6 +87,7 @@ public abstract class NSetTest {
         testSet.add(data[0]);
         testSet.add(data[0]);
         assertFalse(testSet.isEmpty());
+     
         assertEquals(1, testSet.size());
     }
 

@@ -92,7 +92,12 @@ public class BArrayNSet implements NSet {
      * @return The number of items.
      */
     public int size() {
-         throw new UnsupportedOperationException();
+    	if (isEmpty()) { return 0; }
+        int size = 0;
+    	for (boolean x : internal) {
+    		if (x) size++;
+    	}
+    	return size;
     }
 
 
@@ -139,7 +144,12 @@ public class BArrayNSet implements NSet {
      */
     public NSet union(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BArrayNSet oth = (BArrayNSet) other;
+        BArrayNSet toReturn = new BArrayNSet(internal.length);
+        for (int i = 0; i < internal.length; i++) {
+        	toReturn.internal[i] = internal[i] || oth.internal[i];
+        }
+        return toReturn;
     }
 
     /**
@@ -151,7 +161,13 @@ public class BArrayNSet implements NSet {
      */
     public NSet intersection(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BArrayNSet oth = (BArrayNSet) other;
+        BArrayNSet toReturn = new BArrayNSet(internal.length);
+        
+        for (int i = 0; i < internal.length; i++) {
+        	toReturn.internal[i] = internal[i] && oth.internal[i];
+        }
+        return toReturn;
     }
 
     /**
@@ -164,7 +180,16 @@ public class BArrayNSet implements NSet {
      */
     public NSet difference(NSet other) {
         checkParameter(other);
-         throw new UnsupportedOperationException();
+        BArrayNSet oth = (BArrayNSet) other;
+        BArrayNSet toReturn = new BArrayNSet(internal.length);
+        
+        for (int i = 0; i < internal.length; i++) {
+        	if (internal[i] && oth.internal[i]) toReturn.internal[i] = false;
+        	else if (internal[i]) toReturn.internal[i] = true;
+        	else toReturn.internal[i] = false;
+        }
+        
+        return toReturn;
     }
 
     /**
@@ -178,7 +203,38 @@ public class BArrayNSet implements NSet {
         int j = 0;
         while (j < internal.length && !internal[j]) j++;
         final int finalJ = j;
-         throw new UnsupportedOperationException();
+        
+        // calculate the number of true values in the array
+        int trues = 0;
+        for (int k = 0; k < internal.length; k++) if (internal[k]) trues++;
+        final int finalTrues = trues;
+        
+        return new Iterator<Integer>() {
+
+        	Integer i = finalJ;
+        	int trues = finalTrues;
+        	
+        	@Override
+			public boolean hasNext() {
+        		if (trues > 0) return true;
+				return false;
+        	}
+
+			@Override
+			public Integer next() {
+				if (!hasNext()) throw new NoSuchElementException();
+				int returner = i;
+				for (int j = i + 1; j < internal.length; j++) {
+					if (internal[j]) {
+						i = j;
+						break;
+					}
+				}
+				trues--;
+				return returner;
+			}
+        
+        };
     }
 
 }
