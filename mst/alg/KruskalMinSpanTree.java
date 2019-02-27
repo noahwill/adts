@@ -39,7 +39,13 @@ public class KruskalMinSpanTree implements MinSpanTree {
                 });
         DisjointSet vertexConnections = new OptimizedQuickUnionDisjointSet(g.numVertices());
         
-         //Add code here in part 4
+        for (int i = 0; i < g.numEdges(); i++) {
+        	WeightedEdge e = allEdges.extractMax();
+        	if(vertexConnections.find(e.first) != vertexConnections.find(e.second)) {
+        		treeEdges.add(e);
+        		vertexConnections.union(e.first, e.second);
+        	}
+        }
         
         return treeEdges;
     }
