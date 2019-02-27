@@ -127,11 +127,11 @@ public class HeapPriorityQueue<K> implements PriorityQueue<K> {
     public K extractMax() { 
     	if (isEmpty()) throw new NoSuchElementException();
     	K toReturn = internal.get(0);
-    	internal.set(0, internal.get(internal.heapSize()-1));
-    	internal.decreaseKeyAt(0);
-    	internal.set(internal.heapSize()-1, null);
+    	internal.swap(0, internal.heapSize()-1);
     	internal.decrementHeapSize();
-    	return toReturn;  
+    	if(size() > 0) { decreaseKey(internal.get(0)); }
+    	
+    	return toReturn;    
     }
 
     /**
