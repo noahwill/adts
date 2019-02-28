@@ -279,7 +279,7 @@ public class Heap<E> {
      * @param item The item to put at the given position
      */
     public void set(int i, E item) {
-        assert i >= 0 && i < heapSize;
+        assert i >= 0;
         internal[i] = item;
     }
     
