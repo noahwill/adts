@@ -33,8 +33,20 @@ public class BellmanFordSSSP implements SSSP {
             distanceBounds[i] = Double.POSITIVE_INFINITY;
             parents[i] = -1;
         }
-        //Add code here in part 3
+        int V = g.numVertices();
+        distanceBounds[source] = 0;
         
+        while (V > 1) {
+	        for(int u = 0; u < g.numVertices(); u++) {
+	        	for (int v : g.adjacents(u)) {
+	        		if (distanceBounds[v] > distanceBounds[u] + g.weight(u, v)) {
+	        			distanceBounds[v] = distanceBounds[u] + g.weight(u, v);
+	        			parents[v] = u;
+	        		}
+	        	}
+	        }
+	      V--;
+        }
                 
         Set<WeightedEdge> treeEdges = new HashSet<WeightedEdge>();
         
