@@ -6,26 +6,22 @@ public class AVLBalancer<K extends Comparable<K>,V> implements Balancer<K,V,AVLI
         fix.getInfo().recompute();
       
         // Right violated
-        if (fix.getInfo().getBalance() < -1) {
+        if (fix.getInfo().getBalance() < -1) 
+        {
         	// Right - Left Violated
-        	if (fix.getLeft().getInfo().getBalance() > 1) {
-        		fix.getLeft().rotateRight();
-        	}
-        	
-        	fix.rotateLeft();
+        	if (fix.getRight().getInfo().getBalance() > 0) fix.rightRotateRight();
+        	return fix.rotateLeft();
         }
         
         // Left violated
-        if (fix.getInfo().getBalance() > 1) {
+        else if (fix.getInfo().getBalance() > 1) 
+        {
         	// Left - Right Violated
-        	if (fix.getRight().getInfo().getBalance() < -1) {
-        		fix.getRight().rotateRight();
-        	}
-        	
-        	fix.rotateRight();
+        	if (fix.getLeft().getInfo().getBalance() < 0) fix.leftRotateLeft();
+        	return fix.rotateRight();
     	}
         
-        
+        // No violation
         return fix;
     }
 
