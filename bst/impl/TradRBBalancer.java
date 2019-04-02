@@ -3,8 +3,48 @@ package impl;
 public class TradRBBalancer<K extends Comparable<K>, V> extends RBBalancer<K, V>  {
     public BSTMap<K, V, RBInfo<K, V>>.Node putFixup(BSTMap<K, V, RBInfo<K, V>>.Node fix) {
         RBInfo<K,V> info = fix.getInfo();
-
-         // add code here
+        
+        // Any Red Uncle
+        if(info.isRedL() && info.isRedR()) 
+        {
+        	if (info.isRedLL() || info.isRedLR() 
+        	 || info.isRedRR() || info.isRedRL()) {
+    		fix.getLeft().getInfo().blacken();
+    		fix.getRight().getInfo().blacken();
+    		fix.getInfo().redden();
+    	
+    		fix.getRight().getInfo().recompute();
+    		fix.getLeft().getInfo().recompute();
+    		fix.getInfo().recompute();
+        	}
+        }
+        
+        // Left Black Uncle
+        else if (info.isRedL() && !info.isRedR()) 
+        {
+        	// Left - Right BU
+        	if(info.isRedLR()) fix.leftRotateLeft();
+	        // Left - Left BU
+	        if (info.isRedLL()) {
+	        	fix.getInfo().redden();
+		        fix.getLeft().getInfo().blacken();
+		        fix = fix.rotateRight();
+	        }  
+        }
+        
+        
+        // Right - Right Black Uncle
+        else if (info.isRedR() && !info.isRedL()) 
+        {
+        	// Right - Left BU
+        	if(info.isRedRL()) fix.rightRotateRight();
+        	// Right - Right BU
+	        if (info.isRedRR()) {
+	        	fix.getInfo().redden();
+		        fix.getRight().getInfo().blacken();
+		        fix = fix.rotateLeft();
+	        }
+        }
         
         return fix;
            
