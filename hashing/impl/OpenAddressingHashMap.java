@@ -334,7 +334,9 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
      * @return The value associated with this key, null if none exists
      */
     public V get(K key) {
-         throw new UnsupportedOperationException();
+         int i = find(key);
+         if(i == -1) return null;
+         return table[i].value;
     }
 
     
@@ -344,23 +346,51 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
-         throw new UnsupportedOperationException();
-    }
+    	int k = h.hash(key);
 
+    	Iterator<Integer> probe = prober.probe(key);
+    	
+    	while(table[k] != null && ! key.equals(table[k].key) 
+        		&& table[k] != deleted) {
+            
+    		assert probe.hasNext();
+            k = probe.next();
+        }
+        
+        if (table[k] == null || table[k] == deleted) {
+        	table[k] = new Pair<K,V>(key, val);
+    		numPairs++;
+        }
+        
+        else table[k].value = val;
+    	
+    	
+    	if ((double) numPairs/table.length > loadFactor) rehash();
+         
+    }
     
     /**
      * Make the table bigger and rehash the elements.
      */
     @SuppressWarnings("unchecked")
     synchronized private void rehash() {
-        assert !rehashing;
+    	assert !rehashing;
         rehashing = true;
 
-         throw new UnsupportedOperationException();
+        Pair<K,V>[] oldTable = table;
+        table = (Pair<K,V>[]) new Pair[PrimeSource.nextOrEqPrime(oldTable.length*2)];
+        h = HashFactory.plainOldHashFunction(table.length);
+        int oldNumPairs = numPairs;
+        numPairs = 0;
+    
+        for (Pair<K,V> p : oldTable) {
+            if(p == null || p == deleted) {}
+            else put(p.key, p.value); 
+        }
 
         assert numPairs == oldNumPairs;
+
         rehashing = false;
-         throw new UnsupportedOperationException();
     }
 
     /**
@@ -390,7 +420,23 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
      * Produce an iterator for the keys of this map.
      */
     public Iterator<K> iterator() {
-         throw new UnsupportedOperationException();
+         return new Iterator<K>() {
+        	int i = 0;
+        	int left = numPairs;
+			@Override
+			public boolean hasNext() {
+				return left != 0;
+			}
+
+			@Override
+			public K next() {
+				if (!hasNext()) throw new NoSuchElementException();
+				while(table[i] == null || table[i] == deleted) i++;
+				left--;
+				return table[i].key;
+			}
+        	 
+         };
     }
 
     public String toString() {
