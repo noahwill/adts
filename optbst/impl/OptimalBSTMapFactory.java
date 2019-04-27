@@ -5,6 +5,7 @@ import static impl.OptimalBSTMap.dummy;
 import java.util.Arrays;
 
 import impl.OptimalBSTMap.Internal;
+import impl.OptimalBSTMap.Node;
 
 
 
@@ -60,9 +61,60 @@ public class OptimalBSTMapFactory {
         
         // The number of keys (so we don't need to say keys.length every time)
         int n = keys.length;
-
-
-         throw new UnsupportedOperationException();
+        
+        // optTrees[0][n-1] should be the optimal subtrees
+        Internal[][] root = new Internal[n][n];
+        
+        // C[i][j] = total weighted depth for the best tree for key range [k[i], k[j]]
+        double[][] C = new double[n][n];
+        
+        // T[i][j] = total probability for the best tree for key range [k[i],k[j]]
+        double[][] T = new double[n][n];
+        
+        for (int i = 0; i < n; i++) {
+        	T[i][i] = missProbs[i] + keyProbs[i] + missProbs[i+1];
+        	C[i][i] = 2*missProbs[i] + 2*keyProbs[i] + 2*missProbs[i+1];
+        	root[i][i] = new Internal(dummy, keys[i], values[i], dummy);
+        }
+        
+        int j = 0;
+        double t,c;
+        Internal best = new Internal(dummy, null, null, dummy);
+        for (int l = 1; l < n; l++) {
+        	for (int i = 0; j < n - 1; i++) {
+        		j = i + l;
+        		System.out.print("i: " + i + "j: " + j);
+        		t = T[i][i];
+        		for(int r = i; r < j; r++) {
+        			if(r == i) {
+        				C[i][j] = missProbs[i] + t + C[i+1][j];
+        				best = new Internal(dummy, keys[i], values[i], root[i+1][j]);
+        			}
+        			
+        			else if (r == j) {
+        				c = C[i][j-1] + t + missProbs[j+1]; 
+        				if(c < C[i][j]) {
+        					C[i][j] = c;
+        					best = new Internal(root[i][j-1], keys[j], values[j], dummy);
+        				}
+        			}
+        			
+        			else {
+	        			c = C[i][r-1] + t + C[r+1][j];
+	        			if(c < C[i][j]) {
+	        				C[i][j] = c;
+	        				best = new Internal(root[i][r-1], keys[r], values[r], root[r+1][j]);
+	        			}
+        			}
+        		}
+        		T[i][j] = t;
+        		root[i][j] = best;	
+        	}
+        }
+        
+        return new OptimalBSTMap(root[0][n-1]);
+        
+     
     }
 
     /**
