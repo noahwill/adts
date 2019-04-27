@@ -160,7 +160,9 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      */
     @SuppressWarnings("unchecked")
     public PerfectHashMap(K[] keys) {
-         throw new UnsupportedOperationException();
+         p = findMaskAndGreatestKey(keys);
+         m = keys.length;
+         h = HashFactory.universalHashFunction(p, m, mask);
     }
 
     /**
