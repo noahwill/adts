@@ -334,9 +334,12 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
      * @return The value associated with this key, null if none exists
      */
     public V get(K key) {
-         int i = find(key);
-         if(i == -1) return null;
-         return table[i].value;
+         if (!containsKey(key)) return null;
+         else {
+        	 int i = find(key);
+        	 return table[i].value;
+         }
+         
     }
 
     
@@ -346,14 +349,16 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
      * @param val The value to which this key is associated
      */
     public void put(K key, V val) {
+    	if (key == null) throw new IllegalArgumentException();
+    	
     	int k = h.hash(key);
 
     	Iterator<Integer> probe = prober.probe(key);
     	
-    	while(table[k] != null && ! key.equals(table[k].key) 
+    	while(table[k] != null && ! key.equals(table[k].key)
         		&& table[k] != deleted) {
             
-    		assert probe.hasNext();
+    		if (!probe.hasNext()) rehash();
             k = probe.next();
         }
         
@@ -363,10 +368,8 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
         }
         
         else table[k].value = val;
-    	
-    	
-    	if ((double) numPairs/table.length > loadFactor) rehash();
-         
+        
+        if ((double) numPairs/table.length > loadFactor) rehash();
     }
     
     /**
@@ -378,14 +381,13 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
         rehashing = true;
 
         Pair<K,V>[] oldTable = table;
-        table = (Pair<K,V>[]) new Pair[PrimeSource.nextOrEqPrime(oldTable.length*2)];
+        table = (Pair<K,V>[]) new Pair[prober.resize(oldTable.length)];
         h = HashFactory.plainOldHashFunction(table.length);
         int oldNumPairs = numPairs;
         numPairs = 0;
-    
+        
         for (Pair<K,V> p : oldTable) {
-            if(p == null || p == deleted) {}
-            else put(p.key, p.value); 
+            if(p != null && p != deleted) put(p.key, p.value); 
         }
 
         assert numPairs == oldNumPairs;
@@ -422,18 +424,20 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
     public Iterator<K> iterator() {
          return new Iterator<K>() {
         	int i = 0;
-        	int left = numPairs;
+        	int remaining = numPairs;
 			@Override
 			public boolean hasNext() {
-				return left != 0;
+				return remaining != 0;
 			}
 
 			@Override
 			public K next() {
 				if (!hasNext()) throw new NoSuchElementException();
 				while(table[i] == null || table[i] == deleted) i++;
-				left--;
-				return table[i].key;
+				K toReturn = table[i].key;
+				i++;
+				remaining--;
+				return toReturn;
 			}
         	 
          };

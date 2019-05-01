@@ -468,8 +468,9 @@ public abstract class HashMapTest extends MapStressTest {
         num = 0;
         for (SkeletonKey k : skMap) {
             assertFalse(marks[k.extra]);
+        	
             marks[k.extra] = true;
-            num++;
+            num++; 
         }
         assertFalse(marks[1]);
         assertEquals(3, num);

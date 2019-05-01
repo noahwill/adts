@@ -83,7 +83,7 @@ public class OptimalBSTMapFactory {
         for (int l = 1; l < n; l++) {
         	for (int i = 0; j < n - 1; i++) {
         		j = i + l;
-        		System.out.print("i: " + i + "j: " + j);
+        		
         		t = T[i][i];
         		for(int r = i; r < j; r++) {
         			if(r == i) {
