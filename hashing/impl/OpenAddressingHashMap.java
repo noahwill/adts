@@ -352,24 +352,27 @@ public class OpenAddressingHashMap<K, V> implements Map<K, V> {
     	if (key == null) throw new IllegalArgumentException();
     	
     	int k = h.hash(key);
-
-    	Iterator<Integer> probe = prober.probe(key);
+    	if(containsKey(key)) { 
+    		table[find(key)].value = val;
+    	}
     	
-    	while(table[k] != null && ! key.equals(table[k].key)
-        		&& table[k] != deleted) {
-            
-    		if (!probe.hasNext()) rehash();
-            k = probe.next();
-        }
-        
-        if (table[k] == null || table[k] == deleted) {
-        	table[k] = new Pair<K,V>(key, val);
-    		numPairs++;
-        }
-        
-        else table[k].value = val;
-        
-        if ((double) numPairs/table.length > loadFactor) rehash();
+    	else {
+    		
+	    	Iterator<Integer> probe = prober.probe(key);
+	    	
+	    	while(table[k] != null && table[k] != deleted) {
+	    		if (!probe.hasNext()) rehash();
+	            k = probe.next();
+	        }
+	        
+	        if (table[k] == null || table[k] == deleted) {
+	        	table[k] = new Pair<K,V>(key, val);
+	    		numPairs++;
+	        }
+	        
+	        if (((double) numPairs + deleteds)/table.length > loadFactor) rehash();
+    	}
+    	
     }
     
     /**

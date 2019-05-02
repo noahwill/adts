@@ -24,38 +24,30 @@ public class OptimizedLPOpenAddressingHashMap<K,V> extends OpenAddressingHashMap
         super(1);
     }
     
-    
-    public void removeHelper(int gap, K key) {
-    	int p = find(key);
-    	int i = h.hash(key);
-
-    	if (gap >= i && gap < p) { table[gap] = table[p]; table[p] = deleted; }
-    	else if (p < i && i <= gap) { table[gap] = table[p]; table[p] = deleted; }
-    	else if (p < i && gap < p) { table[gap] = table[p]; table[p] = deleted; }
-
-    	if(p+1 < table.length) removeHelper(p,table[p+1].key);
-    }
     /**
      * Remove the association for this key, if it exists.
      * @param key The key to remove
      */
     @Override  // now that's a REAL override
     public void remove(K key) {
-    	int k = find(key);
-        if(k != -1) {
-        	table[k] = deleted;
-        	
-        	Iterator<Integer> probe = prober.probe(key);
-            int i;
-            do {
-                assert probe.hasNext();
-                i = probe.next();
-            } while(table[i] != null && ! key.equals(table[i].key));
-            
-        }  
+		int gap = find(key);
+	    if(gap != -1) {
+	    	table[gap] = null;
+	        int p = (gap + 1) % table.length;
+	        int i;
+	        while(table[p] != null) {
+	            i = h.hash(table[p].key);
+	            if ((gap >= i && gap < p) || (p < i && i <= gap) || (p < i && gap < p)) { 
+	            	
+		            table[gap] = table[p];
+		            table[p] = null;
+		            gap = p;
+	            }
+	            p = (p+1) % table.length; 
+	        }
+	        numPairs--;
+	    } 
     }
-    
-    
 }
 
 

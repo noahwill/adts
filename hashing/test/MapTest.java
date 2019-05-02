@@ -112,7 +112,7 @@ public abstract class MapTest extends CollectionTest{
             String key = it.next();
             boolean foundIt = false;
             for (int i = 0; i < getData().length && ! foundIt; i += 2) {
-                if (getData()[i].equals(key)) {
+               if (getData()[i].equals(key)) {
                     // key returned from iterator has right value in map
                     assertEquals(getData()[i+1], testMap.get(key));
                     // iterator hasn't returned this key before
