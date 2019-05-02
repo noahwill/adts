@@ -2,6 +2,7 @@ package impl;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 
 import adt.Set;
 
@@ -49,9 +50,31 @@ public class TrieSet implements Set<String> {
          * subtrie rooted at this node.
          * @return
          */
-        public int size() {
-             throw new UnsupportedOperationException();
+        
+        
+        
+        public int size() { 
+        	TrieNode node = root;
+        	int size = 0;
+        	if(node == null) {
+        		return size;
+        	}
+        	Stack<TrieNode> stack = new Stack<TrieNode>();
+        	stack.push(node);
+        	
+        	while(!stack.isEmpty()) {
+        		TrieNode top = stack.pop();
+        		for(int i = 0; i < 26; i++) {
+        			if(top.children[i] != null)
+        			stack.push(top.children[i]);
+        		}
+        		if(top.terminal) size++;
+        	}
+        	return size;
         }
+        
+        
+
 
         /**
          * Remove a String (suffix) from the subtrie rooted here.
@@ -63,11 +86,55 @@ public class TrieSet implements Set<String> {
          * removal, or null otherwise
          */
         public TrieNode remove(String item) {
-             throw new UnsupportedOperationException();
-                
+        	
+        	if(!contains(item)) {
+        		return this;
+        	}
+        	
+    		TrieNode current = root;
+        	int i = 0;
+        	int terminalCount = 0;
+        	
+        	//until we reach the last letter of the string...
+        	while(i<item.length()-1) {
+        		//move down the trie
+        		if(current.terminal) terminalCount++;
+        		current = current.children[c2i(item.charAt(i++))];
+        	}
+        	
+        	if(root.terminal) {
+        		root.terminal=false;
+        	}
+        	
+        	//string is unique (contains no other strings, not a prefix of a longer string)—delete all nodes
+        	if(terminalCount == 0 && current.numChildren() == 1) {
+        		String newString = item.substring(0, i);
+        		current.children[c2i(item.charAt(i))] = null;
+        		current.terminal = true;
+        		remove(newString);
+        	}
+        	
+        	//string is prefix of another longer string—set terminal to false
+        	else if(current.numChildren() > 1) {
+        		current.children[c2i(item.charAt(i))].terminal = false;
+        	}
+        	return this;
         }
+        
+        public int numChildren() {
+        	int numChildren = 0;
+        	for(int i = 0; i<26; i++) {
+        		if(this.children[i] != null) numChildren++;
+        	}
+        	return numChildren;
+        }
+        
 
-        /**
+        
+        
+
+        
+		/**
          * Iterator for the strings in this subtrie.
          * @param prefix The prefix to prepend to the suffixes found
          * in this subtrie to make them strings in the main trie
@@ -166,19 +233,38 @@ public class TrieSet implements Set<String> {
      */
     public TrieSet() { this(0); }
 
+    
     /**
      * Add an item to this set.
      */
     public void add(String item) {
-         throw new UnsupportedOperationException();
+    	if(!contains(item)) {
+    		TrieNode current = root;
+        	for(int i = 0; i < item.length(); i++) {
+        		//if the next character doesn't exist within the tree yet...
+        		if(current.children[c2i(item.charAt(i))] == null) {
+        			//make a new node there
+        			current.children[c2i(item.charAt(i))] = new TrieNode();
+
+        		}
+        		//then, move current to the next character down
+        		current = current.children[c2i(item.charAt(i))];
+        	}
+        	current.terminal = true;
+    	}
+    	return;
     }
+
 
     /**
      * Does this set contain the given item?
      */
     public boolean contains(String item) {
-         throw new UnsupportedOperationException();
-    }
+    	TrieNode current = root;
+    	int i = 0;
+    	while(current != null && i<item.length()) current = current.children[c2i(item.charAt(i++))];
+    	return current != null && current.terminal;
+    	}
 
     /**
      * Remove the given item from the set, if it exists
@@ -200,7 +286,7 @@ public class TrieSet implements Set<String> {
      * at the root.
      */
     public boolean isEmpty() {
-         throw new UnsupportedOperationException();
+    	return size()==0;
     }
 
     /**
