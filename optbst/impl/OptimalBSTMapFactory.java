@@ -63,7 +63,7 @@ public class OptimalBSTMapFactory {
         int n = keys.length;
         
         // optTrees[0][n-1] should be the optimal subtrees
-        Internal[][] root = new Internal[n][n];
+        Node[][] root = new Node[n][n];
         
         // C[i][j] = total weighted depth for the best tree for key range [k[i], k[j]]
         double[][] C = new double[n][n];
@@ -71,44 +71,48 @@ public class OptimalBSTMapFactory {
         // T[i][j] = total probability for the best tree for key range [k[i],k[j]]
         double[][] T = new double[n][n];
         
+        double bestC = 0.0;
+        double currentC = 0.0;
+        Internal best;
+        
         for (int i = 0; i < n; i++) {
         	T[i][i] = missProbs[i] + keyProbs[i] + missProbs[i+1];
-        	C[i][i] = 2*missProbs[i] + 2*keyProbs[i] + 2*missProbs[i+1];
-        	root[i][i] = new Internal(dummy, keys[i], values[i], dummy);
+        	C[i][i] = (2*missProbs[i]) + keyProbs[i] + (2*missProbs[i+1]);
+        	best = new Internal(dummy, keys[i], values[i], dummy);
+        	root[i][i] = best;
         }
         
-        int j = 0;
-        double t,c;
-        Internal best = new Internal(dummy, null, null, dummy);
+        
         for (int l = 1; l < n; l++) {
-        	for (int i = 0; j < n - 1; i++) {
-        		j = i + l;
+        	for (int i = 0; i < n - l; i++) {
+        		int j = i + l;
+        		// each tree will have the same total probability
+        		T[i][j] = missProbs[i] + keyProbs[i] + T[i+1][j];
         		
-        		t = T[i][i];
-        		for(int r = i; r < j; r++) {
-        			if(r == i) {
-        				C[i][j] = missProbs[i] + t + C[i+1][j];
-        				best = new Internal(dummy, keys[i], values[i], root[i+1][j]);
-        			}
-        			
-        			else if (r == j) {
-        				c = C[i][j-1] + t + missProbs[j+1]; 
-        				if(c < C[i][j]) {
-        					C[i][j] = c;
-        					best = new Internal(root[i][j-1], keys[j], values[j], dummy);
-        				}
-        			}
-        			
-        			else {
-	        			c = C[i][r-1] + t + C[r+1][j];
-	        			if(c < C[i][j]) {
-	        				C[i][j] = c;
-	        				best = new Internal(root[i][r-1], keys[r], values[r], root[r+1][j]);
-	        			}
-        			}
+        		// r = i
+        		bestC = missProbs[i] + T[i][j] + C[i+1][j];
+        		best = new Internal(dummy, keys[i], values[i], root[i+1][j]);
+        		
+        		// i < r < j
+        		for(int r = i+1; r < j; r++) {
+    				currentC = C[i][r-1] + T[i][j] + C[r+1][j];
+        			if(currentC < bestC) {
+    					best = new Internal(root[i][r-1], keys[r], values[r], root[r+1][j]);
+    					//best = new Internal(root[i][j-1], keys[j], values[j], dummy);
+    					bestC = currentC;
+    				}
+    			}
+        		
+        		// r = j
+        		currentC = T[i][j] + C[i][j-1] + missProbs[j+1];
+        		if (currentC < bestC) {
+        			bestC = currentC;
+        			best = new Internal(root[i][j-1], keys[j], values[j], dummy);
         		}
-        		T[i][j] = t;
-        		root[i][j] = best;	
+        		
+        		// assign the values in the tables
+        		C[i][j] = bestC;
+        		root[i][j] = best;
         	}
         }
         
