@@ -58,7 +58,24 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
          */
         @SuppressWarnings("unchecked")
         SecondaryMap(Set<K> givenKeys) {
-             throw new UnsupportedOperationException();
+
+            m = givenKeys.size();
+
+            keys = (K[]) new Object[m];
+            values = (V[]) new Object[m];
+
+            h = HashFactory.universalHashFunction(p, m, mask);
+
+            while (true) {
+	            boolean check = true;
+	            for (K k1 : givenKeys) {
+		            for (K k2 : givenKeys) 
+		                if (!k1.equals(k2) && h.hash(k1) == h.hash(k2)) check = false;
+	            }
+	            if (check) break;
+	            else h = HashFactory.universalHashFunction(p, m, mask);
+            }
+
         }
 
         /**
@@ -112,12 +129,25 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         * The iterator for this portion of the map.
         */
         public Iterator<K> iterator() { 
-            // In theory you don't need to write this; all you need
-            // to support is PerfectHashMap.iterator().
-            // However, in my version the iterator for PerfectHashMap
-            // relied on iterators of the secondary maps.
-            // You could use a different approach.
-             throw new UnsupportedOperationException();
+            int i = 0;
+            while(i < keys.length && keys[i] == null) i++;
+            final int finalI = i;
+             return new Iterator<K>() {
+            	int i = finalI;
+				@Override
+				public boolean hasNext() {
+					return i < m;
+				}
+
+				@Override
+				public K next() {
+					K toReturn = keys[i];
+					i++;
+					while(i< keys.length && keys[i] == null) i++;
+					return toReturn;
+				}
+            	 
+             };
         }
         
     }
@@ -160,9 +190,29 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      */
     @SuppressWarnings("unchecked")
     public PerfectHashMap(K[] keys) {
-         p = findMaskAndGreatestKey(keys);
-         m = keys.length;
-         h = HashFactory.universalHashFunction(p, m, mask);
+
+        m = keys.length;
+        int greatest = findMaskAndGreatestKey(keys);
+        p = PrimeSource.nextOrEqPrime(greatest);
+        h = HashFactory.universalHashFunction(p, m, mask);
+
+        Set<K>[] buckets = new ListSet[m];
+        // for each bucket create a set
+        for (int i = 0; i < m; i++) {
+                buckets[i] = new ListSet<K>();
+        }
+
+        for (int i = 0; i < m; i++) {
+                int hash = h.hash(keys[i]);
+                buckets[hash].add(keys[i]);
+        }
+
+        secondaries = (SecondaryMap[]) new PerfectHashMap.SecondaryMap[m];
+
+        for (int i = 0; i < m; i++) {
+                secondaries[i] = new SecondaryMap(buckets[i]);
+        }
+
     }
 
     /**
@@ -253,7 +303,41 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
      * Return an iterator over this map
      */
     public Iterator<K> iterator() {
-         throw new UnsupportedOperationException();
+        int i = 0;
+        while (i < secondaries.length && !secondaries[i].iterator().hasNext()) i++;
+        final int finalI = i;
+    	
+        if(i == secondaries.length) {
+        	return new Iterator<K>() {
+        		public boolean hasNext() { return false; }
+        		public K next() { return null; }	
+        	};
+        }
+        
+    	return new Iterator<K>() {
+        	int i = finalI;
+        	Iterator<K> secondary = secondaries[i].iterator();
+        	
+			@Override
+			public boolean hasNext() {
+				return (i < secondaries.length);
+			}
+
+			@Override
+			public K next() {
+				K toReturn = secondary.next();
+				
+				if(!secondary.hasNext()) {
+					do
+						i++;
+					while(i < secondaries.length && !secondaries[i].iterator().hasNext());
+					if(i == secondaries.length) return toReturn;
+					secondary = secondaries[i].iterator();
+				}
+				return toReturn;
+			}
+        	 
+         };
     }
 
 }
