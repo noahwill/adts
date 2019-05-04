@@ -307,6 +307,7 @@ public class PerfectHashMap<K, V> implements Map<K, V> {
         while (i < secondaries.length && !secondaries[i].iterator().hasNext()) i++;
         final int finalI = i;
     	
+        // Dummy iterator - handles empty iterator
         if(i == secondaries.length) {
         	return new Iterator<K>() {
         		public boolean hasNext() { return false; }

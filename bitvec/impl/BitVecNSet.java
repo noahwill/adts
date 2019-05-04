@@ -78,9 +78,8 @@ public class BitVecNSet implements NSet {
      */ 
     public boolean contains(Integer item) {
         checkIndex(item);
-        if (((internal[item/8] >> (item%8)) & 1) == 1)
-    		return true;
-    	return false;
+        return (internal[item/8] & 1 << (item%8)) != 0;
+    		
     }
 
     /**
@@ -99,10 +98,7 @@ public class BitVecNSet implements NSet {
      * @return True if the set is empty, false otherwise.
      */
     public boolean isEmpty() {
-    	for (int i = 0; i < 8; i++) {
-    		if (contains(i)) return false;
-    	}
-        return true;
+    	return size() == 0;
     }
 
 
@@ -182,8 +178,10 @@ public class BitVecNSet implements NSet {
         BitVecNSet oth = (BitVecNSet) other;
         BitVecNSet toReturn = new BitVecNSet(range);
         
-        for (int i = 0; i < internal.length; i++) {
-        	toReturn.internal[i] = (byte) (internal[i] ^ oth.internal[i]);
+        for (int i = 0; i < range / 8 + 1; i++) {
+        	if (i <= oth.range() / 8 + 1)
+        		toReturn.internal[i] = (byte) (internal[i] ^ oth.internal[i] & internal[i]);
+        	else toReturn.internal[i] = (byte) (internal[i]);
         }
         return toReturn;
     }
@@ -193,14 +191,23 @@ public class BitVecNSet implements NSet {
      * @return The number of items.
      */
     public int size() {
-        int size = 0;
-    	for (int i = 0; i < internal.length - 1; i++)
-            for (int j = 0; j < 8; j++)
-                if ((internal[i] & (1 << j)) == 0);
-                else size++;
-        for (int j = 0; j < range % 8; j++)
-            if ((internal[internal.length - 1] & (1 << j)) == 0);
-            else size++;
+    	int progByte = 0;
+    	int progBit = 0;
+    	int size = 0;
+    	
+    	//iterate through bytes
+    	while(progByte < internal.length) {
+			//iterate through bits
+			while(progBit < 8) {
+				if (((internal[progByte] & (1 << progBit))) != 0)
+					size++;
+				progBit++;
+			}
+			// reset the bit progress and move onto the next byte
+			progBit = 0;
+			progByte++;
+		}
+    	
         return size;
     }
 
@@ -209,17 +216,26 @@ public class BitVecNSet implements NSet {
      */
     public Iterator<Integer> iterator() {
     	
-    	// calculate the index of the first true position,
-        // if any; that is, the first value the iterator should
-        // return
-        int first = 0;
-        for (int j = 0; j < internal.length - 1; j++)
-            for (int k = 0; k < 8; k++)
-                if ((internal[j] & (1 << k)) == 1) {
-                	first = k;
+    	// byte the first bit is in
+        int byte1 = 0;
+        // first bit that is turned on
+        int bit1 = 0;
+        
+        for (int i = 0; i < internal.length; i++)
+                if (internal[i] != 0) {
+                	byte1 = i;
                 	break;
                 }
-        final int finalFirst = first;
+    
+    	for (int j = 0; j < 8; j++)
+            if ((internal[byte1] & (1 << j)) != 0) {
+            	bit1 = j;
+            	break;
+            }
+        
+        
+        final int initByte = byte1;
+        final int initBit = bit1;
         
         // calculate the number of true values in the array
         int ons = size();
@@ -227,31 +243,41 @@ public class BitVecNSet implements NSet {
         
         return new Iterator<Integer>() {
         	 
-        	int i = finalFirst;
+        	int progByte = initByte;
+        	int progBit = initBit;
         	int ons = finalOns;
+        	
 			@Override
 			public boolean hasNext() {
-				if (ons > 0) return true;
-				return false;
+				return ons > 0;
 			}
 
 			@Override
 			public Integer next() {
 				if (!hasNext()) throw new NoSuchElementException();
-				int returner = i;
-				for (int j = 0; j < internal.length - 1; j++)
-		            for (int k = i; k < 8; k++)
-		                if ((internal[j] & (1 << k)) == 1) {
-							i = k;
-							break;
-		                }
 				
-		                
+				//save toReturn and update state
+				int toReturn = progByte * 8 + progBit;
 				ons--;
-				return returner;
+				progBit++;
+				
+				//iterate through bytes
+				while(progByte < internal.length) {
+					//iterate through bits
+					while(progBit < 8) {
+						if (((internal[progByte] & (1 << progBit))) != 0)
+							return toReturn;
+						progBit++;
+					}
+					// reset the bit progress and move onto the next byte
+					progBit = 0;
+					progByte++;
+				}
+				
+				return toReturn;
 			}
         	 
-         };
+        };
     }
 
     public String toString() {
